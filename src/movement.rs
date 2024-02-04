@@ -43,7 +43,14 @@ pub fn check_movement(
 }
 
 pub fn character_movement(
-    mut player: Query<(&mut Transform, &player::Player, &animation::AnimationBundle, &mut TextureAtlasSprite, &mut custom_components::Moving, Entity)>,
+    mut player: Query<(
+        &mut Transform,
+        &player::Player, 
+        &animation::AnimationBundle, 
+        &mut TextureAtlasSprite, 
+        &mut custom_components::Moving, 
+        Entity
+    )>,
     time: Res<Time>,
     mut commands: Commands,
 ) {

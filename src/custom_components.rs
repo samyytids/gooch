@@ -15,8 +15,6 @@ pub struct Moving {
     pub direction: Directions,
 }
 
-
-
 impl Moving {
     pub fn decrement(&mut self, amount: u8) {
         self.index -= amount;

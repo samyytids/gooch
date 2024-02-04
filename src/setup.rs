@@ -1,7 +1,6 @@
 use bevy::prelude::*;
 use crate::*;
 
-
 pub fn temp_setup(
     mut commands: Commands,
     asset_server: Res<AssetServer>,

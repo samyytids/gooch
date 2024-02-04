@@ -29,21 +29,22 @@ pub struct AnimationTimer(pub Timer);
 pub fn animate_sprite(
     time: Res<Time>,
     mut query: Query<(
-        &AnimationIndices,
-        &mut AnimationTimer,
+        &mut AnimationBundle,
         &mut TextureAtlasSprite,
         &mut player::Player,
     )>,
 ) {
-    for (indices, mut timer, mut sprite, mut player) in &mut query {
+    for (mut animation_bundle, mut sprite, mut player) in &mut query {
+
         if player.animation_state == player::AnimationState::Idle {
             continue
         }
-        timer.tick(time.delta());
-        if timer.just_finished() {
-            sprite.index = if sprite.index == indices.last {
+        
+        animation_bundle.timer.tick(time.delta());
+        if animation_bundle.timer.just_finished() {
+            sprite.index = if sprite.index == animation_bundle.indices.last {
                 player.animation_state = player::AnimationState::Idle;
-                indices.first
+                animation_bundle.indices.first
             } else {
                 sprite.index + 1
             }
