@@ -16,7 +16,15 @@ pub fn temp_setup(
         first: 0,
         last: 2
     };
+
+    let texture = asset_server.load("tiledbg.png");
+
     commands.spawn(Camera2dBundle::default());
+    commands.spawn((SpriteBundle {
+        texture,
+        transform: Transform::from_scale(Vec3::splat(6.0)),
+        ..default()
+    },));
     commands.spawn((
         SpriteSheetBundle {
             texture_atlas: texture_atlas_handle,
@@ -31,7 +39,7 @@ pub fn temp_setup(
             ),
         },
         player::Player { 
-            speed: 100.0,
+            speed: 200.0,
             animation_state: default(),
         }
     ));

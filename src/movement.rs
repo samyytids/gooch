@@ -1,11 +1,18 @@
 use crate::*;
 
 pub fn check_movement(
-    mut player: Query<(&mut player::Player, &mut animation::AnimationBundle, Entity), Without<custom_components::Moving>>,
+    mut player: Query<(
+        &mut player::Player, 
+        &mut animation::AnimationBundle, 
+        Entity), 
+        Without<custom_components::Moving>>,
     input: Res<Input<KeyCode>>,
     mut commands: Commands,
 ) {
-    for (mut player, mut animation_bundle, player_id) in player.iter_mut() {
+    for (mut player, 
+        mut animation_bundle, 
+        player_id) 
+        in player.iter_mut() {
 
         let mut moving = false;
         let mut direction = custom_components::Directions::None;
@@ -36,7 +43,8 @@ pub fn check_movement(
         }
         if moving {
             player.animation_state = player::AnimationState::Animating;
-            commands.entity(player_id).insert(custom_components::Moving::new(16*6, direction));
+            commands.entity(player_id)
+            .insert(custom_components::Moving::new(direction));
         }
     }
     
@@ -44,42 +52,54 @@ pub fn check_movement(
 
 pub fn character_movement(
     mut player: Query<(
+        & player::Player,
         &mut Transform,
-        &player::Player, 
         &animation::AnimationBundle, 
         &mut TextureAtlasSprite, 
         &mut custom_components::Moving, 
         Entity
     )>,
-    time: Res<Time>,
+    time:  Res<Time>,
     mut commands: Commands,
 ) {
-    for (mut transform, player, animation_bundle, mut texture_atlas, mut moving, player_id) in player.iter_mut() {
-        let movement_amount = player.speed * time.delta_seconds();
+    for (player,
+        mut transform, 
+        animation_bundle, 
+        mut texture_atlas, 
+        mut moving, 
+        player_id) 
+        in player.iter_mut() {
+        
+        let mut movement_amount = player.speed*time.delta_seconds();
 
-        if moving.index == 0 {
+        println!("{}", time.delta_seconds());
+
+        if moving.distance == 16.0 {
             commands.entity(player_id).remove::<custom_components::Moving>();
             continue;
         }
 
-        moving.decrement(1);
-        if texture_atlas.index > animation_bundle.indices.last || texture_atlas.index <= animation_bundle.indices.first {
+        moving.distance += movement_amount;
+
+
+        // Place these numbers into a resource so I don't have to use magic
+        // numbers. 
+        if moving.distance > 16.0*6.0 {
+            movement_amount = movement_amount - moving.distance % 16.0;
+            moving.distance = 16.0;
+        }
+        if texture_atlas.index > animation_bundle.indices.last ||
+            texture_atlas.index <= animation_bundle.indices.first {
             texture_atlas.index = animation_bundle.indices.first;    
         }
 
-        if moving.direction == custom_components::Directions::Up {
-            transform.translation.y += movement_amount;
+        match moving.direction {
+            custom_components::Directions::Up => transform.translation.y += movement_amount,
+            custom_components::Directions::Left => transform.translation.x -= movement_amount,
+            custom_components::Directions::Down => transform.translation.y -= movement_amount,
+            custom_components::Directions::Right => transform.translation.x += movement_amount,
+            _ => println!("movement bug")
         }
-        if moving.direction == custom_components::Directions::Left {
-            transform.translation.x -= movement_amount;
-        }
-        if moving.direction == custom_components::Directions::Down {
-            transform.translation.y -= movement_amount;
-        }
-        if moving.direction == custom_components::Directions::Right {
-            transform.translation.x += movement_amount;
-        }
-        println!("{}", moving.index);
     }
     
 }
