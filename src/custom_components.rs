@@ -11,19 +11,15 @@ pub enum Directions {
 
 #[derive(Component)]
 pub struct Moving {
-    pub index: u8,
     pub direction: Directions,
+    pub distance: f32,
 }
 
 impl Moving {
-    pub fn decrement(&mut self, amount: u8) {
-        self.index -= amount;
-    }
-
-    pub fn new(index: u8, direction: Directions) -> Self {
+    pub fn new(direction: Directions) -> Self {
         Moving {
-            index,
             direction,
+            distance: 0.0,
         }
     }
 }
