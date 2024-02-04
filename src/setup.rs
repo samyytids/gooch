@@ -25,10 +25,12 @@ pub fn temp_setup(
             transform: Transform::from_scale(Vec3::splat(6.0)),
             ..default()
         },
-        animation_indices,
-        animation::AnimationTimer(
-            Timer::from_seconds(0.1, TimerMode::Repeating)
-        ),
+        animation::AnimationBundle {
+            indices: animation_indices,
+            timer: animation::AnimationTimer(
+                Timer::from_seconds(0.1, TimerMode::Repeating)
+            ),
+        },
         player::Player { 
             speed: 100.0,
             animation_state: default(),

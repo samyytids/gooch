@@ -3,6 +3,7 @@ mod animation;
 mod setup;
 mod player;
 mod movement;
+mod custom_components;
 
 fn main() {
     App::new()
@@ -11,6 +12,7 @@ fn main() {
         .add_systems(
             Update,
             (
+                movement::check_movement.before(movement::character_movement),
                 movement::character_movement,
                 animation::animate_sprite.after(movement::character_movement)
             )
