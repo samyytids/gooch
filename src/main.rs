@@ -4,6 +4,8 @@ mod setup;
 mod player;
 mod movement;
 mod custom_components;
+mod npcs;
+mod collision;
 
 fn main() {
     App::new()
@@ -14,7 +16,7 @@ fn main() {
             (
                 movement::check_movement.before(movement::character_movement),
                 movement::character_movement,
-                animation::animate_sprite.after(movement::character_movement)
+                animation::animate_sprite.after(movement::character_movement),
             )
         )
         .run();

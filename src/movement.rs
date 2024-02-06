@@ -1,11 +1,15 @@
 use crate::*;
 
+use self::collision::check_collision;
+
 pub fn check_movement(
     mut player: Query<(
         &mut player::Player, 
         &mut animation::AnimationBundle, 
         Entity), 
         Without<custom_components::Moving>>,
+    player_query: Query<&Transform, With<player::Player>>,
+    collider_query: Query<(Entity, &Transform), (With<collision::Collider>, Without<player::Player>)>,
     input: Res<Input<KeyCode>>,
     mut commands: Commands,
 ) {
@@ -41,6 +45,12 @@ pub fn check_movement(
             moving = true;
             direction = custom_components::Directions::Right;
         }
+
+        match check_collision(&player_query, &collider_query, &direction) {
+            Some(_) => {moving = false},
+            None => (),
+        }
+
         if moving {
             player.animation_state = player::AnimationState::Animating;
             commands.entity(player_id)
@@ -72,21 +82,19 @@ pub fn character_movement(
         
         let mut movement_amount = player.speed*time.delta_seconds();
 
-        println!("{}", time.delta_seconds());
-
-        if moving.distance == 16.0 {
+        if moving.distance == 16.0*6.0 {
+            transform.translation = transform.translation.round();
             commands.entity(player_id).remove::<custom_components::Moving>();
             continue;
         }
 
         moving.distance += movement_amount;
 
-
         // Place these numbers into a resource so I don't have to use magic
         // numbers. 
         if moving.distance > 16.0*6.0 {
             movement_amount = movement_amount - moving.distance % 16.0;
-            moving.distance = 16.0;
+            moving.distance = 16.0*6.0;
         }
         if texture_atlas.index > animation_bundle.indices.last ||
             texture_atlas.index <= animation_bundle.indices.first {
@@ -98,6 +106,7 @@ pub fn character_movement(
             custom_components::Directions::Left => transform.translation.x -= movement_amount,
             custom_components::Directions::Down => transform.translation.y -= movement_amount,
             custom_components::Directions::Right => transform.translation.x += movement_amount,
+            custom_components::Directions::None => println!("No need to move"),
             _ => println!("movement bug")
         }
     }
